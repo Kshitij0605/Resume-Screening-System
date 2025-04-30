@@ -1,0 +1,6 @@
+flask
+transformers
+PyPDF2
+python-docx
+matplotlib
+Flask-Session

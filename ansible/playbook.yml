@@ -1,0 +1,53 @@
+- name: Setup Resume Screening App from Local Source
+  hosts: resume_app
+  become: true
+
+  tasks:
+    - name: Update packages
+      apt:
+        update_cache: yes
+        upgrade: dist
+
+    - name: Install system dependencies
+      apt:
+        name:
+          - python3
+          - python3-pip
+          - python3-venv
+          - git
+        state: present
+
+    - name: Create app directory on remote
+      file:
+        path: /home/ubuntu/resume_app
+        state: directory
+        mode: '0755'
+
+    - name: Copy app code to remote
+      copy:
+        src: ../
+        dest: /home/ubuntu/resume_app/
+        owner: ubuntu
+        group: ubuntu
+        mode: '0755'
+
+    - name: Create virtual environment
+      command: python3 -m venv /home/ubuntu/resume_app/venv
+      args:
+        creates: /home/ubuntu/resume_app/venv
+
+    - name: Install Python requirements in virtualenv
+      shell: |
+        source /home/ubuntu/resume_app/venv/bin/activate
+        pip install --upgrade pip
+        pip install -r /home/ubuntu/resume_app/requirements.txt
+      args:
+        executable: /bin/bash
+
+    - name: Run the Flask app in background
+      shell: |
+        source /home/ubuntu/resume_app/venv/bin/activate
+        cd /home/ubuntu/resume_app
+        nohup python3 app.py > app.log 2>&1 &
+      args:
+        executable: /bin/bash

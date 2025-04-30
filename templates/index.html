@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Screening System</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            background-color: #f0f2f5; 
+            margin: 0; 
+            padding: 0; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+        }
+
+        .container { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 10px; 
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); 
+            width: 400px;
+            text-align: center;
+        }
+
+        h1 { 
+            font-size: 24px; 
+            margin-bottom: 20px; 
+        }
+
+        input[type="file"] { 
+            padding: 10px; 
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            width: 100%;
+        }
+
+        button { 
+            padding: 12px 20px; 
+            background-color: #28a745; /* Green button */
+            color: white; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            width: 100%; 
+            font-size: 16px; 
+        }
+
+        button:hover { 
+            background-color: #218838; 
+        }
+
+        #response { 
+            margin-top: 20px; 
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Resume Screening System</h1>
+    <form id="upload-form" enctype="multipart/form-data">
+        <input type="file" name="resume" id="resume" required>
+        <button type="submit">Upload and Analyze</button>
+    </form>
+    <div id="response"></div>
+</div>
+
+<script>
+    document.getElementById("upload-form").onsubmit = async function(event) {
+        event.preventDefault();
+        
+        let formData = new FormData(document.getElementById("upload-form"));
+    
+        try {
+            let response = await fetch("/upload", {
+                method: "POST",
+                body: formData
+            });
+
+            let result = await response.json();
+            
+            if (result.error) {
+                document.getElementById("response").innerHTML = `<p style="color:red;">${result.error}</p>`;
+            } else if (result.success) {
+                window.location.href = "/results"; 
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            document.getElementById("response").innerHTML = `<p style="color:red;">Upload failed. Check console for details.</p>`;
+        }
+    };
+</script>
+
+</body>
+</html>
